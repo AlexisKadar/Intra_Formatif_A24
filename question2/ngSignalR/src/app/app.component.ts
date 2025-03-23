@@ -4,11 +4,11 @@ import { MatButtonModule } from '@angular/material/button';
 
 
 @Component({
-    selector: 'app-root',
-    templateUrl: './app.component.html',
-    styleUrls: ['./app.component.css'],
-    standalone: true,
-    imports: [MatButtonModule]
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css'],
+  standalone: true,
+  imports: [MatButtonModule]
 })
 export class AppComponent {
   title = 'Pizza Hub';
@@ -23,7 +23,7 @@ export class AppComponent {
   money: number = 0;
   nbPizzas: number = 0;
 
-  constructor(){
+  constructor() {
     this.connect();
   }
 
@@ -32,21 +32,46 @@ export class AppComponent {
       .withUrl('http://localhost:5282/hubs/pizza')
       .build();
 
-    // TODO: Mettre isConnected à true seulement une fois que la connection au Hub est faite
-    this.isConnected = true;
+    this.hubConnection.on('UpdateNbUsers', (data) => {
+      this.nbUsers = data;
+    })
+
+    this.hubConnection.on('UpdatePizzaPrice', (data) => {
+      this.pizzaPrice = data;
+    })
+
+    this.hubConnection.on('UpdateMoney', (data) => {
+      this.money = data;
+    })
+
+    this.hubConnection.on('UpdateNbPizzasAndMoney', (dataNbPizza, dataMoney) => {
+      this.nbPizzas = dataNbPizza;
+      this.money = dataMoney;
+    })
+
+    this.hubConnection
+      .start()
+      .then(() => {
+        this.isConnected = true;
+      })
+      .catch(err => console.log('Error while starting connection: ' + err))
   }
 
-  selectChoice(selectedChoice:number) {
+  selectChoice(selectedChoice: number) {
     this.selectedChoice = selectedChoice;
+    this.hubConnection?.invoke('SelectChoice', selectedChoice);
   }
 
   unselectChoice() {
     this.selectedChoice = -1;
+    this.hubConnection?.invoke('UnselectChoice', this.selectedChoice);
   }
 
   addMoney() {
+    this.hubConnection?.invoke('AddMoney', this.selectedChoice);
   }
 
   buyPizza() {
+    this.hubConnection?.invoke('BuyPizza', this.selectedChoice);
   }
 }
