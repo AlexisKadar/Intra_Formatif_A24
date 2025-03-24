@@ -51,12 +51,11 @@
         Votre commentaire ne contient pas assez de mots (minimum 10)
       </mat-error>
 
-      <mat-error *ngIf="form.hasError('nameInComment')">
-        Le commentaire ne doit pas mentionner le nom de l'utilisateur.
-      </mat-error>
-
-
     </mat-form-field>
+
+    <mat-error *ngIf="form.hasError('nameInComment')">
+      Le commentaire ne doit pas mentionner le nom de l'utilisateur.
+    </mat-error>
 
     <mat-card-actions align="end">
       <button mat-raised-button color="primary" [disabled]="!form.valid">Acheter</button>
